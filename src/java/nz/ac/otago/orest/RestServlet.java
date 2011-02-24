@@ -1,0 +1,121 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package nz.ac.otago.orest;
+
+import nz.ac.otago.orest.enums.HttpMethod;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import orest.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import students.dao.StudentDAO;
+
+/**
+ *
+ * @author mark
+ */
+public class RestServlet extends HttpServlet {
+
+   private final static Logger logger = LoggerFactory.getLogger(RestServlet.class);
+
+   /**
+    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+    * @param request servlet request
+    * @param response servlet response
+    * @throws ServletException if a servlet-specific error occurs
+    * @throws IOException if an I/O error occurs
+    */
+   protected void processRequest(HttpServletRequest request, HttpServletResponse response, HttpMethod method)
+         throws ServletException, IOException {
+
+      logger.debug("Processing request.");
+
+      Configuration configuration = new Configuration();
+      configuration.configure();
+
+      String contentType = request.getContentType();
+      
+      logger.debug("Content-Type is '{}'", contentType);
+
+      // see if we have a REST session yet - if not create one and add it to the standard session
+      RestSession session = (RestSession) request.getSession().getAttribute("session");
+      if (session == null) {
+         session = new RestSession();
+
+         session.setConfiguration(configuration);
+         
+         request.getSession().setAttribute("session", session);
+
+         logger.debug("Created new REST session.");
+
+      } else {
+         logger.debug("Using existing REST session.");
+      }
+
+      String path = request.getPathInfo();
+      logger.debug("Path = '{}'", path);
+      logger.debug("Method = '{}'", method);
+      
+      if(!path.equals("/")) {
+         try {
+            session.processRequest(path, method, response, contentType);
+         } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.error("Exception occurred processing request", ex);
+         }
+      }
+
+   }
+
+   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+   /**
+    * Handles the HTTP <code>GET</code> method.
+    * @param request servlet request
+    * @param response servlet response
+    * @throws ServletException if a servlet-specific error occurs
+    * @throws IOException if an I/O error occurs
+    */
+   @Override
+   protected void doGet(HttpServletRequest request, HttpServletResponse response)
+         throws ServletException, IOException {
+      processRequest(request, response, HttpMethod.GET);
+   }
+
+   /**
+    * Handles the HTTP <code>POST</code> method.
+    * @param request servlet request
+    * @param response servlet response
+    * @throws ServletException if a servlet-specific error occurs
+    * @throws IOException if an I/O error occurs
+    */
+   @Override
+   protected void doPost(HttpServletRequest request, HttpServletResponse response)
+         throws ServletException, IOException {
+      processRequest(request, response, HttpMethod.POST);
+   }
+
+   @Override
+   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      processRequest(request, response, HttpMethod.DELETE);
+   }
+
+   @Override
+   protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      processRequest(request, response, HttpMethod.PUT);
+   }
+
+
+   /**
+    * Returns a short description of the servlet.
+    * @return a String containing servlet description
+    */
+   @Override
+   public String getServletInfo() {
+      return "Main OREST servlet";
+   }// </editor-fold>
+}
