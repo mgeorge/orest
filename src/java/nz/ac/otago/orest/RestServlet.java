@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import orest.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import students.dao.StudentDAO;
 
 /**
  *
@@ -65,7 +64,7 @@ public class RestServlet extends HttpServlet {
          try {
             session.processRequest(path, method, response, contentType);
          } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();  // TODO: remove stacktrace
             logger.error("Exception occurred processing request", ex);
          }
       }
