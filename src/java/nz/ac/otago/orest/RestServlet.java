@@ -30,15 +30,12 @@ public class RestServlet extends HttpServlet {
     * @throws IOException if an I/O error occurs
     */
    protected void processRequest(HttpServletRequest request, HttpServletResponse response, HttpMethod method)
-         throws ServletException, IOException {
+           throws ServletException, IOException {
 
       logger.debug("Processing request.");
 
-      Configuration configuration = new Configuration();
-      configuration.configure();
-
       String contentType = request.getContentType();
-      
+
       logger.debug("Content-Type is '{}'", contentType);
 
       // see if we have a REST session yet - if not create one and add it to the standard session
@@ -46,8 +43,16 @@ public class RestServlet extends HttpServlet {
       if (session == null) {
          session = new RestSession();
 
+         RestConfiguration configuration = new Configuration();
+
+         String configurationErrors = configuration.checkConfiguration();
+         if (configurationErrors != null) {
+            response.sendError(412, configurationErrors);
+            return;
+         }
+
          session.setConfiguration(configuration);
-         
+
          request.getSession().setAttribute("session", session);
 
          logger.debug("Created new REST session.");
@@ -59,10 +64,10 @@ public class RestServlet extends HttpServlet {
       String path = request.getPathInfo();
       logger.debug("Path = '{}'", path);
       logger.debug("Method = '{}'", method);
-      
-      if(!path.equals("/")) {
+
+      if (!path.equals("/")) {
          try {
-            session.processRequest(path, method, response, contentType);
+            session.processRequest(path, method, request, response, contentType);
          } catch (Exception ex) {
             ex.printStackTrace();  // TODO: remove stacktrace
             logger.error("Exception occurred processing request", ex);
@@ -81,7 +86,7 @@ public class RestServlet extends HttpServlet {
     */
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-         throws ServletException, IOException {
+           throws ServletException, IOException {
       processRequest(request, response, HttpMethod.GET);
    }
 
@@ -94,7 +99,7 @@ public class RestServlet extends HttpServlet {
     */
    @Override
    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-         throws ServletException, IOException {
+           throws ServletException, IOException {
       processRequest(request, response, HttpMethod.POST);
    }
 
@@ -107,7 +112,6 @@ public class RestServlet extends HttpServlet {
    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       processRequest(request, response, HttpMethod.PUT);
    }
-
 
    /**
     * Returns a short description of the servlet.

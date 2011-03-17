@@ -10,7 +10,13 @@ import nz.ac.otago.orest.resource.RestResource;
  */
 public interface RestFormat {
 
-   String formatResource(RestResource resource, RestRequest request);
-   String formatCollection(Collection<? extends RestResource> collection, RestRequest request);
+   // serialisation
+   String serialiseResource(RestResource resource, RestRequest request);
+   String serialiseCollection(Collection<? extends RestResource> collection, RestRequest request);
+
+   // deserialisation
+   RestResource deserialiseResource(String data, RestRequest request);
+//   Collection<? extends RestResource> deserialiseCollection(String data, RestRequest request);
+
    String getContentType();
 }

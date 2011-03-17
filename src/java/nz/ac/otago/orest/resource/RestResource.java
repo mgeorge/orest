@@ -6,6 +6,6 @@ package nz.ac.otago.orest.resource;
  */
 public interface RestResource {
 
-   public String getStringId();
+   public abstract String getResourceId();
 
 }

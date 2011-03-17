@@ -5,33 +5,43 @@ import java.util.HashMap;
 import java.util.Map;
 import nz.ac.otago.orest.annotations.Controller;
 import nz.ac.otago.orest.controller.RestController;
-import nz.ac.otago.orest.util.UpdateHelper;
 import students.domain.Student;
 
 /**
  *
  * @author mark
  */
-@Controller(path="students")
+@Controller(path = "students")
 public final class StudentDAO implements RestController<Student> {
 
-   private static Map<String, Student> students = new HashMap<String, Student>();
+   private static Map<Integer, Student> students = new HashMap<Integer, Student>();
 
    public StudentDAO() {
-      if(students.isEmpty()) {
+      if (students.isEmpty()) {
          create(new Student(1234, "Jim"));
          create(new Student(4321, "Bob"));
       }
    }
 
    public void create(Student student) {
-      students.put(String.valueOf(student.getId()), student);
+      students.put(student.getId(), student);
    }
 
-   public void update(String id, Map<String,Object> tuples) {
-      Student student = get(id);
+   public void update(String id, Student update) {
+      if (students.containsKey(new Integer(id))) {
+         Student student = get(id);
 
-      new UpdateHelper().update(student, tuples);
+         if(update.getId() != null) {
+            student.setId(update.getId());
+         }
+
+         if(update.getName() != null) {
+            student.setName(update.getName());
+         }
+         
+      } else {
+         create(update);
+      }
    }
 
    public Collection<Student> getAll() {
@@ -39,13 +49,11 @@ public final class StudentDAO implements RestController<Student> {
    }
 
    public Student get(String id) {
-      Student s = students.get(id);
+      Student s = students.get(new Integer(id));
       return s;
    }
 
    public void delete(String id) {
-      System.out.println("*****DELETE CALLED with ID " + id);
-      students.remove(id);
+      students.remove(new Integer(id));
    }
-
 }

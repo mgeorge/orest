@@ -9,10 +9,8 @@ import nz.ac.otago.orest.resource.RestResource;
 public class Student implements RestResource {
 
    private Integer id;
-   
    private String name;
-
-   private Paper paper;
+//   private Paper paper;
 
    public Student(Integer id, String name) {
       this.id = id;
@@ -43,7 +41,7 @@ public class Student implements RestResource {
       return id + "\n" + name;
    }
 
-   public String getStringId() {
+   public String getResourceId() {
       return String.valueOf(id);
    }
 

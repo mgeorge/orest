@@ -1,26 +1,33 @@
 package nz.ac.otago.orest;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import nz.ac.otago.orest.enums.HttpMethod;
 import java.util.Collection;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nz.ac.otago.orest.controller.RestController;
 import nz.ac.otago.orest.formats.RestFormat;
 import nz.ac.otago.orest.resource.RestResource;
-import orest.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RestSession {
 
    private final static Logger logger = LoggerFactory.getLogger(RestSession.class);
-   private Configuration config;
+   
+   private RestConfiguration config;
 
-   public void setConfiguration(Configuration config) {
+   public RestConfiguration getConfiguration() {
+      return config;
+   }
+
+   public void setConfiguration(RestConfiguration config) {
       this.config = config;
    }
 
-   void processRequest(String path, HttpMethod method, HttpServletResponse response, String contentType) throws Exception {
+   void processRequest(String path, HttpMethod method, HttpServletRequest request, HttpServletResponse response, String contentType) throws Exception {
 
       RestFormat format = config.getFormat(contentType);
       if (format == null) {
@@ -32,32 +39,31 @@ public class RestSession {
 
       RestController<?> controller = config.getController(root);
 
-      RestRequest restRequest = new RestRequest(root, controller, response, format);
+      RestRequest restRequest = new RestRequest(root, controller, request, response, format);
 
       if (pathElements.length > 2) {
 
          String id = pathElements[2];
+
          logger.debug("Using resource ID '{}'", id);
+         restRequest.setResourceId(id);
 
          if (method == HttpMethod.DELETE) {
-            logger.debug("Calling delete({}) on controller", id);
-            controller.delete(id);
+            deleteResource(restRequest);
          } else if (method == HttpMethod.POST) {
-            // TODO implement POST/create interaction
-            logger.debug("Calling create on controller");
-            controller.create(null);
+//            createResource(restRequest, format);
+            response.sendError(405, String.format("Method '%1s' can not be used with path '%2s'.  Adding child resources not yet implemented.", method, path));
          } else if (method == HttpMethod.PUT) {
-            // TODO implement PUT/update interaction
-            logger.debug("Calling update on controller");
-            controller.update(id, null);
+            updateResource(restRequest);
          } else if (method == HttpMethod.GET) {
-
             requestResource(restRequest, id);
          }
 
       } else if (method == HttpMethod.GET) {
          // if root selected (since there is no ID
          requestRoot(restRequest);
+      } else if (method == HttpMethod.POST) {
+         createResource(restRequest, format);
       } else {
          logger.error("Method '{}' and Path '{}' do not make sense.", method, path);
          response.sendError(405, String.format("Method '%1s' can not be used with path '%2s'", method, path));
@@ -65,27 +71,71 @@ public class RestSession {
    }
 
    private void requestRoot(RestRequest restRequest) throws Exception {
-      logger.debug("Getting all resources for controller");
-
+      logger.debug("Getting all resources IDs from controller");
       Collection<? extends RestResource> col = restRequest.getController().getAll();
 
       RestFormat format = restRequest.getFormat();
-      HttpServletResponse response = restRequest.getResponse();
+      HttpServletResponse response = restRequest.getServletResponse();
 
-      response.getWriter().println(format.formatCollection(col, restRequest));
+      response.setContentType(format.getContentType());
+      response.getWriter().println(format.serialiseCollection(col, restRequest));
    }
 
    private void requestResource(RestRequest restRequest, String id) throws Exception {
-      logger.debug("Getting single resource with ID '{}'", id);
+      logger.debug("Getting single resource with ID '{}' from controller", id);
       RestResource resource = restRequest.getController().get(id);
       if (resource != null) {
          RestFormat format = restRequest.getFormat();
-         HttpServletResponse response = restRequest.getResponse();
-         String responseString = format.formatResource(resource, restRequest);
+         HttpServletResponse response = restRequest.getServletResponse();
+         String responseString = format.serialiseResource(resource, restRequest);
          response.setContentType(format.getContentType());
          response.getWriter().println(responseString);
       } else {
-         restRequest.getResponse().sendError(404, String.format("Resource with id '%1s' does not exist", id));
+         restRequest.getServletResponse().sendError(404, String.format("Resource with id '%1s' does not exist", id));
       }
+   }
+
+   private void createResource(RestRequest request, RestFormat format) throws Exception {
+      String data = readBody(request);
+
+      RestResource resource = format.deserialiseResource(data, request);
+
+      RestController controller = request.getController();
+
+      logger.debug("Calling create on controller");
+      controller.create(resource);
+   }
+
+   private void updateResource(RestRequest request) throws Exception {
+      RestController controller = request.getController();
+      String id = request.getResourceId();
+
+      String body = readBody(request);
+
+      RestResource resource = request.getFormat().deserialiseResource(body, request);
+
+      logger.debug("Calling update on controller for resource '{}'", id);
+      controller.update(id, resource);
+   }
+
+   private void deleteResource(RestRequest request) {
+      RestController controller = request.getController();
+      String id = request.getResourceId();
+
+      logger.debug("Calling delete on controller");
+      controller.delete(id);
+   }
+
+   private String readBody(RestRequest request) throws Exception {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(request.getServletRequest().getInputStream()));
+      StringBuilder builder = new StringBuilder();
+      String line = reader.readLine();
+      while (line != null) {
+         builder.append(line);
+         line = reader.readLine();
+      }
+      String body = builder.toString();
+
+      return body;
    }
 }

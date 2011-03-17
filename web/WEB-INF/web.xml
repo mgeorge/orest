@@ -6,7 +6,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ORestServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
