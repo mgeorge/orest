@@ -18,7 +18,7 @@ public abstract class RestConfiguration {
    private Map<String, RestController<?>> controllers = new HashMap<String, RestController<?>>();
    private Map<String, RestFormat> formats = new HashMap<String, RestFormat>();
    private Map<String, Class> resourceTypes = new HashMap<String, Class>();
-   private String defaultContentType = "text/plain";
+   private String defaultContentType = "text/xml";
 
    public abstract void configure();
 
@@ -35,8 +35,7 @@ public abstract class RestConfiguration {
    protected void addController(RestController<?> controller) {
       Controller annotation = controller.getClass().getAnnotation(Controller.class);
       if (annotation == null) {
-         // TODO add error message telling user to add annotation
-         System.out.println("BUGGER");
+         return;
       }
       String path = annotation.path();
       controllers.put(path, controller);
@@ -53,7 +52,7 @@ public abstract class RestConfiguration {
 
       if (controllers.isEmpty()) {
          ok = false;
-         builder.append("There are no controllers registered!");
+         builder.append("There are no controllers registered, or @Controller annotation was not present!");
       }
 
       if(ok) {

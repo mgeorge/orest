@@ -33,7 +33,6 @@
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
-                <root id="src.examples.dir" name="example"/>
                 <root id="src.dir" name="orest"/>
             </source-roots>
             <test-roots>
