@@ -6,6 +6,7 @@ import nz.ac.otago.orest.enums.HttpMethod;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import nz.ac.otago.orest.util.PropertyUtils;
 
 import nz.ac.otago.orest.controller.RestController;
 import nz.ac.otago.orest.formats.RestFormat;
@@ -51,8 +52,7 @@ public class RestSession {
          if (method == HttpMethod.DELETE) {
             deleteResource(restRequest);
          } else if (method == HttpMethod.POST) {
-//            createResource(restRequest, format);
-            response.sendError(405, String.format("Method '%1s' can not be used with path '%2s'.  Adding child resources not yet implemented.", method, path));
+            response.sendError(405, String.format("Method '%1s' can not be used with path '%2s'.", method, path));
          } else if (method == HttpMethod.PUT) {
             updateResource(restRequest);
          } else if (method == HttpMethod.GET) {
@@ -63,7 +63,7 @@ public class RestSession {
          // if root selected (since there is no ID
          requestRoot(restRequest);
       } else if (method == HttpMethod.POST) {
-         createResource(restRequest, format);
+         createResource(restRequest);
       } else {
          logger.error("Method '{}' and Path '{}' do not make sense.", method, path);
          response.sendError(405, String.format("Method '%1s' can not be used with path '%2s'", method, path));
@@ -95,10 +95,10 @@ public class RestSession {
       }
    }
 
-   private void createResource(RestRequest request, RestFormat format) throws Exception {
+   private void createResource(RestRequest request) throws Exception {
       String data = readBody(request);
 
-      RestResource resource = format.deserialiseResource(data, request);
+      RestResource resource = request.getFormat().deserialiseResource(data, request);
 
       RestController controller = request.getController();
 
@@ -110,12 +110,33 @@ public class RestSession {
       RestController controller = request.getController();
       String id = request.getResourceId();
 
-      String body = readBody(request);
+      // does resource already exist?
+      if (controller.get(id) != null) {
+         // if so update it
 
-      RestResource resource = request.getFormat().deserialiseResource(body, request);
+         RestResource original = controller.get(id);
 
-      logger.debug("Calling update on controller for resource '{}'", id);
-      controller.update(id, resource);
+         String body = readBody(request);
+
+         RestResource resource = request.getFormat().deserialiseResource(body, request);
+
+         Collection<String> fields = PropertyUtils.getAllProperties(resource.getClass());
+
+         for (String field : fields) {
+            Object value = PropertyUtils.getProperty(resource, field);
+            if (value != null) {
+               logger.debug("Updating field '{}' for resource '{}'", field, id);
+               PropertyUtils.setProperty(original, field, value);
+            }
+         }
+
+         logger.debug("Calling update on controller for resource '{}'", id);
+         controller.update(id, resource);
+      } else {
+         // does not exist so create it
+         logger.debug("Creating resource via PUT");
+         createResource(request);
+      }
    }
 
    private void deleteResource(RestRequest request) {

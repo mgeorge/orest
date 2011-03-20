@@ -1,6 +1,8 @@
-package nz.ac.otago.orest.NOLONGERUSED;
+package nz.ac.otago.orest.util;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * A utility class for getting/setting object property values.
@@ -11,8 +13,11 @@ import java.lang.reflect.Field;
  * 
  * Will work its way up the inheritance tree if it can't find the property in
  * the given instance
- * 
+ *
+ *
  * @author Mark George
+ * @dependencies None
+ *
  */
 public class PropertyUtils {
 
@@ -132,6 +137,23 @@ public class PropertyUtils {
 			throw new RuntimeException(e);
 		}
 	}
+
+   /**
+    * Returns a collection of properties that an object contains.
+    *
+    * @param target
+    * @return
+    */
+   public static Collection<String> getAllProperties(Class<?> target) {
+      Collection<String> properties = new HashSet<String>();
+
+      Field[] fields = target.getDeclaredFields();
+      for (Field field : fields) {
+         properties.add(field.getName());
+      }
+
+      return properties;
+   }
 
 	/**
 	 * Recursively searches the target class and its parent classes for a field

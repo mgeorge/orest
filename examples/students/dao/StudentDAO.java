@@ -28,20 +28,7 @@ public final class StudentDAO implements RestController<Student> {
    }
 
    public void update(String id, Student update) {
-      if (students.containsKey(new Integer(id))) {
-         Student student = get(id);
-
-         if(update.getId() != null) {
-            student.setId(update.getId());
-         }
-
-         if(update.getName() != null) {
-            student.setName(update.getName());
-         }
-         
-      } else {
-         create(update);
-      }
+      // does not need to do anything
    }
 
    public Collection<Student> getAll() {
