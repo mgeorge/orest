@@ -12,12 +12,12 @@ public class Student implements RestResource {
    private String name;
 //   private Paper paper;
 
+   public Student() {
+   }
+
    public Student(Integer id, String name) {
       this.id = id;
       this.name = name;
-   }
-
-   public Student() {
    }
 
    public Integer getId() {
