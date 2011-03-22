@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="orest" default="default" basedir=".">
-    <description>Builds, tests, and runs the project orest.</description>
+<project name="orest-example" default="default" basedir=".">
+    <description>Builds, tests, and runs the project orest-example.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
