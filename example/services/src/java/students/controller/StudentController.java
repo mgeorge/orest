@@ -1,4 +1,4 @@
-package students.dao;
+package students.controller;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,11 +12,11 @@ import students.domain.Student;
  * @author mark
  */
 @Controller(path = "students")
-public final class StudentDAO implements RestController<Student> {
+public final class StudentController implements RestController<Student> {
 
    private static Map<Integer, Student> students = new HashMap<Integer, Student>();
 
-   public StudentDAO() {
+   public StudentController() {
       if (students.isEmpty()) {
          create(new Student(1234, "Jim"));
          create(new Student(4321, "Bob"));

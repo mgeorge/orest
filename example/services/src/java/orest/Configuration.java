@@ -1,8 +1,9 @@
 package orest;
 
 import chat.controller.ChatController;
+import chat.domain.Message;
 import nz.ac.otago.orest.RestConfiguration;
-import students.dao.StudentDAO;
+import students.controller.StudentController;
 import students.domain.Student;
 
 /**
@@ -13,12 +14,10 @@ public class Configuration extends RestConfiguration {
 
 
    public void configure() {
-      super.addController(new StudentDAO());
-      super.addResourceType(Student.class, "student");
-
+      super.addController(new StudentController());
       super.addController(new ChatController());
-
-
+      super.addResourceType(Student.class, "student");
+      super.addResourceType(Message.class, "message");
    }
 
 }

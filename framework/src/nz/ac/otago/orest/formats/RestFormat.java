@@ -16,7 +16,7 @@ public interface RestFormat {
 
    // deserialisation
    RestResource deserialiseResource(String data, RestRequest request);
-//   Collection<? extends RestResource> deserialiseCollection(String data, RestRequest request);
+   Collection<String> deserialiseCollection(String data, RestRequest request);
 
    String getContentType();
 }

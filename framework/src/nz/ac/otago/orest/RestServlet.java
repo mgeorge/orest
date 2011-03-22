@@ -62,6 +62,8 @@ public class RestServlet extends HttpServlet {
       if (!path.equals("/")) {
          try {
             session.processRequest(path, method, request, response, contentType);
+         } catch(ORestException ex) {
+            response.sendError(ex.getHttpStatus(), ex.getMessage());
          } catch (Exception ex) {
             ex.printStackTrace();  // TODO: remove stacktrace
             logger.error("Exception occurred processing request", ex);

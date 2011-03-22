@@ -68,7 +68,7 @@ public abstract class RestConfiguration {
 
     }
 
-    protected void addResourceType(Class clazz, String type) {
+    public void addResourceType(Class clazz, String type) {
         resourceTypes.put(type, clazz);
     }
 

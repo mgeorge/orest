@@ -15,15 +15,17 @@ public class RestRequest {
    private RestController<?> controller;
    private HttpServletRequest request;
    private HttpServletResponse response;
+   private RestConfiguration configuration;
    private String resourceId;
    private RestFormat format;
 
-   public RestRequest(String root, RestController<?> controller, HttpServletRequest request, HttpServletResponse response, RestFormat format) {
+   public RestRequest(String root, RestController<?> controller, HttpServletRequest request, HttpServletResponse response, RestFormat format, RestConfiguration configuration) {
       this.root = root;
       this.controller = controller;
       this.request = request;
       this.response = response;
       this.format = format;
+      this.configuration = configuration;
    }
 
    public RestFormat getFormat() {
@@ -43,13 +45,15 @@ public class RestRequest {
    }
 
    public RestConfiguration getConfiguration() {
-      RestSession session = (RestSession) request.getSession().getAttribute("session");
-      RestConfiguration configuration = session.getConfiguration();
-      return configuration;
+      return this.configuration;
    }
 
    public String getRoot() {
       return root;
+   }
+
+   public void setRoot(String root) {
+      this.root = root;
    }
 
    public String getResourceId() {

@@ -26,9 +26,12 @@ public class SimpleTextFormat implements RestFormat {
    }
 
    public RestResource deserialiseResource(String data, RestRequest request) {
-      throw new UnsupportedOperationException("The plain text serialiser currently only produces data - it can't consume it.");
+      throw new UnsupportedOperationException("The plain text format currently only produces data - it can't consume it.");
    }
 
+   public Collection<String> deserialiseCollection(String data, RestRequest request) {
+      throw new UnsupportedOperationException("The plain text format currently only produces data - it can't consume it.");
+   }
 
    public String getContentType() {
       return "text/plain";

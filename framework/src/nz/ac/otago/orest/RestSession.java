@@ -47,7 +47,7 @@ public class RestSession {
 
       RestController<?> controller = config.getController(root);
 
-      RestRequest restRequest = new RestRequest(root, controller, request, response, format);
+      RestRequest restRequest = new RestRequest(root, controller, request, response, format, config);
 
       if (pathElements.length > 2) {
 
