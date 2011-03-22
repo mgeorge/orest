@@ -45,12 +45,6 @@ public class RestServlet extends HttpServlet {
 
          RestConfiguration configuration = new Configuration();
 
-         String configurationErrors = configuration.checkConfiguration();
-         if (configurationErrors != null) {
-            response.sendError(412, configurationErrors);
-            return;
-         }
-
          session.setConfiguration(configuration);
 
          request.getSession().setAttribute("session", session);

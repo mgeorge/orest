@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class RestSession {
 
    private final static Logger logger = LoggerFactory.getLogger(RestSession.class);
-   
+
    private RestConfiguration config;
 
    public RestConfiguration getConfiguration() {
@@ -37,6 +37,13 @@ public class RestSession {
 
       String[] pathElements = path.split("/");
       String root = pathElements[1];
+
+      String configurationErrors = config.checkConfiguration(root);
+      if (configurationErrors != null) {
+         response.sendError(412, configurationErrors);
+//            throw new RuntimeException();
+         return;
+      }
 
       RestController<?> controller = config.getController(root);
 
