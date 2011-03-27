@@ -36,7 +36,12 @@ public class RestServlet extends HttpServlet {
 
       String contentType = request.getContentType();
 
-      logger.debug("Content-Type is '{}'", contentType);
+      logger.debug("Request Content-Type is '{}'", contentType);
+
+      // strip any crap off the content-type (like charsets)
+      contentType = contentType.replaceFirst("[^(?:\\w*/\\w*)](.*)", "");
+
+      logger.debug("Stripped Content-Type is '{}'", contentType);
 
       // see if we have a REST session yet - if not create one and add it to the standard session
       RestSession session = (RestSession) request.getSession().getAttribute("session");
