@@ -38,8 +38,10 @@ public class RestServlet extends HttpServlet {
 
       logger.debug("Request Content-Type is '{}'", contentType);
 
-      // strip any crap off the content-type (like charsets)
-      contentType = contentType.replaceFirst("[^(?:\\w*/\\w*)](.*)", "");
+      if(contentType != null && !contentType.isEmpty()) {
+         // strip any crap off the content-type (like charsets)
+         contentType = contentType.replaceFirst("[^(?:\\w*/\\w*)](.*)", "");
+      }
 
       logger.debug("Stripped Content-Type is '{}'", contentType);
 
@@ -70,7 +72,6 @@ public class RestServlet extends HttpServlet {
          } catch(ORestException ex) {
             response.sendError(ex.getHttpStatus(), ex.getMessage());
          } catch (Exception ex) {
-            ex.printStackTrace();  // TODO: remove stacktrace
             logger.error("Exception occurred processing request", ex);
          }
       }
