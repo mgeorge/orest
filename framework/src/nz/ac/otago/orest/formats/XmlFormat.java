@@ -2,12 +2,11 @@ package nz.ac.otago.orest.formats;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import nz.ac.otago.orest.ORestException;
@@ -30,7 +29,7 @@ public class XmlFormat implements RestFormat {
 
    public String serialiseResource(RestResource resource, RestRequest request) {
       mapper.alias(resource.getClass().getSimpleName().toLowerCase(), resource.getClass());
-      logger.debug("Serialising resource with xstream");
+      logger.debug("Serialising resource '{}' with xstream", request.getResourceId());
       String xml = mapper.toXML(resource);
       return xml;
    }
@@ -46,7 +45,7 @@ public class XmlFormat implements RestFormat {
          ids.add(resource.getResourceId());
       }
 
-      logger.debug("Serialising resource collection with xstream");
+      logger.debug("Serialising resource collection '{}' with xstream", request.getRoot());
       String xml = mapper.toXML(ids);
       return xml;
    }
@@ -65,10 +64,12 @@ public class XmlFormat implements RestFormat {
          throw new ORestException("There is no resource type registered for '" + root + "'", 412);
       }
 
-      logger.debug("Aliasing '{}' with '{}'", root, resourceType.getName());
-      mapper.alias(root, resourceType);
-
-      logger.debug("Deserialising resource with xstream");
+      for (Map.Entry<String,Class> rt : request.getConfiguration().getResourceTypes().entrySet()) {
+         logger.debug("Aliasing '{}' with '{}'", rt.getKey(), rt.getValue().getCanonicalName());
+         mapper.alias(rt.getKey(), rt.getValue());
+      }
+      
+      logger.debug("Deserialising resource '{}' with xstream", request.getResourceId());
       RestResource resource = (RestResource) mapper.fromXML(data);
 
       return resource;
@@ -88,6 +89,7 @@ public class XmlFormat implements RestFormat {
 
       mapper.alias("id", String.class);
 
+      logger.debug("Deserialising resource collection '{}' with xstream", request.getRoot());
       Collection<String> coll = (Collection<String>) mapper.fromXML(data);
 
       return coll;

@@ -88,6 +88,10 @@ public abstract class RestConfiguration {
         return resourceTypes.get(type);
     }
 
+    public Map<String, Class> getResourceTypes() {
+       return resourceTypes;
+    }
+
     public String getDefaultContentType() {
         return defaultContentType;
     }
