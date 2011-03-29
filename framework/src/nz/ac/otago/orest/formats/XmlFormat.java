@@ -31,7 +31,7 @@ public class XmlFormat implements RestFormat {
          logger.debug("Aliasing '{}' with '{}'", rt.getKey(), rt.getValue().getCanonicalName());
          mapper.alias(rt.getKey(), rt.getValue());
       }
-      
+
       logger.debug("Serialising resource '{}' with xstream", request.getResourceId());
       String xml = mapper.toXML(resource);
       return xml;
