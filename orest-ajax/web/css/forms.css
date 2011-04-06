@@ -1,0 +1,44 @@
+/* 
+   This has been tested with:
+      Firefox 3 - 3.6
+      Chrome/Chromium 2 - 10
+      Opera 10
+      IE 8
+
+   Doesn't work with versions of IE prior to 8.
+*/
+
+fieldset {
+   width:20em;         /* effective width of the form */
+   padding-left:10px;  /* padding to space the components from the fieldset border */
+   padding-right:10px; /* padding to space the components from the fieldset border */
+}
+
+fieldset label, fieldset input, fieldset textarea, fieldset select {
+   margin-bottom:10px;  /* add some spacing between form 'rows' */
+}
+
+fieldset label {
+   float:left;          /* align the labels on the left */
+   width:37%;           /* label width */
+   text-align:right;    /* align the label text right */
+   padding-right:10px;  /* add a small amount of space on the right side of the label */
+   clear:left;          /* make the labels the left most objects in the fieldset */ 
+}
+
+fieldset input, fieldset textarea, fieldset select {
+   width:55%;        /* width of the form components */
+}
+
+fieldset *[type="submit"] {
+   float:left;      /* align the submit button left */
+   width:100%;      /* make the submit button full width */
+}
+
+.fullwidth {        /* used to make any component take up !00% available width */
+   width: 100%;
+}
+
+div.buttongroup {   /* used to centre a group of buttons at the bottom of a form */
+   text-align: center;
+}
