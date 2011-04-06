@@ -39,7 +39,7 @@ function displayStudent(student) {
 }
 
 function remove() {
-   var id = getSelectedProduct();
+   var id = getSelectedStudent();
    client.remove("students/"+id, refreshStudentList);
 }
 
