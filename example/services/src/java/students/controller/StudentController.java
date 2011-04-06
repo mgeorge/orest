@@ -1,8 +1,8 @@
 package students.controller;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import nz.ac.otago.orest.annotations.Controller;
 import nz.ac.otago.orest.controller.RestController;
 import students.domain.Student;
@@ -14,7 +14,7 @@ import students.domain.Student;
 @Controller(path = "students")
 public final class StudentController implements RestController<Student> {
 
-   private static Map<Integer, Student> students = new HashMap<Integer, Student>();
+   private static Map<Integer, Student> students = new TreeMap<Integer, Student>();
 
    public StudentController() {
       if (students.isEmpty()) {
@@ -28,7 +28,8 @@ public final class StudentController implements RestController<Student> {
    }
 
    public void update(String id, Student update) {
-      // does not need to do anything
+      delete(id);
+      create(update);
    }
 
    public Collection<Student> getAll() {
