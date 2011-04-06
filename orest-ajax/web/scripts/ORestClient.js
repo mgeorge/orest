@@ -13,6 +13,8 @@ RestClient.prototype.constructor = RestClient;
 
 RestClient.prototype.getCollection = function(uri, displayFunction) {
 
+   uri = stripUri(uri);
+
    function processResponse(responseText) {
 
       // get the response text (which should be JSON)
@@ -39,11 +41,13 @@ RestClient.prototype.getCollection = function(uri, displayFunction) {
 
    }
 
-   this.sendRequest(this.rootUri + uri, "GET", null, processResponse)
+   this.sendRequest(uri, "GET", null, processResponse)
 
 }
 
 RestClient.prototype.get = function(uri, displayFunction) {
+
+   uri = stripUri(uri);
 
    function processResponse(responseText) {
       // get the response text (which should be JSON)
@@ -66,35 +70,42 @@ RestClient.prototype.get = function(uri, displayFunction) {
       displayFunction(resource);
    }
 
-   this.sendRequest(this.rootUri + uri, "GET", null, processResponse)
+   this.sendRequest(uri, "GET", null, processResponse)
 
 }
 
 RestClient.prototype.remove = function(uri, responseProcessor) {
-   this.sendRequest(this.rootUri + uri, "DELETE", null, responseProcessor);
+   uri = stripUri(uri);
+   this.sendRequest(uri, "DELETE", null, responseProcessor);
 }
 
 RestClient.prototype.update = function(uri, resource, responseProcessor) {
+   uri = stripUri(uri);
+
    // first add a root element to the object since orest expects roots
    resource = addRootElement(resource);
    
    // serialise resource to JSON
    var data = JSON.stringify(resource);
 
-   this.sendRequest(this.rootUri + uri, "PUT", data, responseProcessor);
+   this.sendRequest(uri, "PUT", data, responseProcessor);
 }
 
 RestClient.prototype.create = function(uri, resource, responseProcessor) {
+   uri = stripUri(uri);
+
    // first add a root element to the object since orest expects roots
    resource = addRootElement(resource);
    
    // serialise resource to JSON
    var data = JSON.stringify(resource);
 
-   this.sendRequest(this.rootUri + uri, "POST", data, responseProcessor);
+   this.sendRequest(uri, "POST", data, responseProcessor);
 }
 
-RestClient.prototype.sendRequest = function(fullUri, method, body, responseProcessor) {
+RestClient.prototype.sendRequest = function(uri, method, body, responseProcessor) {
+
+   var fullUri = this.rootUri + uri;
 
    var httpRequest = new XMLHttpRequest();
 
@@ -151,4 +162,15 @@ function addRootElement(resource) {
 
    // return the wrapper
    return o;
+}
+
+function stripUri(uri) {
+   var regex = /(.+)\/$/;
+
+   var hasTrailingSlash = regex.test(uri);
+   if(hasTrailingSlash) {
+      uri = regex.exec(uri)[1];
+   }
+
+   return uri;
 }
