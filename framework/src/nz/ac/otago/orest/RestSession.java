@@ -138,7 +138,7 @@ public class RestSession {
          }
 
          logger.debug("Calling update on controller for resource '{}'", id);
-         controller.update(id, resource);
+         controller.update(id, original);
       } else {
          // does not exist so create it
          logger.debug("Creating resource via PUT");
