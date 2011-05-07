@@ -4,6 +4,8 @@
  */
 package nz.ac.otago.orest;
 
+import java.util.Map;
+import nz.ac.otago.orest.controller.RestController;
 import nz.ac.otago.orest.enums.HttpMethod;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -38,7 +40,7 @@ public class RestServlet extends HttpServlet {
 
       logger.debug("Request Content-Type is '{}'", contentType);
 
-      if(contentType != null && !contentType.isEmpty()) {
+      if (contentType != null && !contentType.isEmpty()) {
          // strip any crap off the content-type (like charsets)
          contentType = contentType.replaceFirst("[^(?:\\w*/\\w*)](.*)", "");
       }
@@ -66,10 +68,19 @@ public class RestServlet extends HttpServlet {
       logger.debug("Path = '{}'", path);
       logger.debug("Method = '{}'", method);
 
-      if (!path.equals("/")) {
+      if (path == null) {
+         if (contentType == null || contentType.equals("text/html")) {
+            response.getWriter().println("<html><body><h1>Registered Controllers</h1>");
+            Map<String, RestController<?>> controllers = session.getConfiguration().getControllers();
+            for (String controllerPath : controllers.keySet()) {
+               response.getWriter().println("<p><a href=\"" + request.getRequestURI() + "/" + controllerPath + "\">" + controllerPath + "</a><p>");
+            }
+            response.getWriter().println("</body></html>");
+         }
+      } else if (!path.equals("/")) {
          try {
             session.processRequest(path, method, request, response, contentType);
-         } catch(ORestException ex) {
+         } catch (ORestException ex) {
             response.sendError(ex.getHttpStatus(), ex.getMessage());
          } catch (Exception ex) {
             logger.error("Exception occurred processing request", ex);

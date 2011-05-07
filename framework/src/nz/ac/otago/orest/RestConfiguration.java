@@ -103,4 +103,8 @@ public abstract class RestConfiguration {
     public RestFormat getDefaultFormat() {
         return formats.get(defaultContentType);
     }
+
+    public Map<String, RestController<?>> getControllers() {
+       return controllers;
+    }
 }
