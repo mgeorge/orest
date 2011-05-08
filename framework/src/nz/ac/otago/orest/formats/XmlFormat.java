@@ -54,11 +54,13 @@ public class XmlFormat implements RestFormat {
    }
 
    public RestResource deserialiseResource(String data, RestRequest request) {
+      System.out.println("\n\n"+data+"\n\n");
+
       // need to get the root element so we can set the correct alias for xstream
       Pattern pattern = Pattern.compile(getRootPattern());
       Matcher matcher = pattern.matcher(data);
       matcher.find();
-      String root = matcher.group(1);
+      String root = matcher.group(1).toLowerCase();
       logger.debug("Using '{}' as root", root);
 
 
@@ -68,8 +70,11 @@ public class XmlFormat implements RestFormat {
       }
 
       for (Map.Entry<String, Class> rt : request.getConfiguration().getResourceTypes().entrySet()) {
-         logger.debug("Aliasing '{}' with '{}'", rt.getKey(), rt.getValue().getCanonicalName());
-         mapper.alias(rt.getKey(), rt.getValue());
+         String resTypeLower = rt.getKey().toLowerCase();
+         String resTypeUpper = resTypeLower.substring(0, 1).toUpperCase() + resTypeLower.substring(1);
+         logger.debug("Aliasing '{}' and '{}' with '{}'", new String[]{resTypeLower, resTypeUpper, rt.getValue().getCanonicalName()});
+         mapper.alias(resTypeLower, rt.getValue());
+         mapper.alias(resTypeUpper, rt.getValue());
       }
 
       logger.debug("Deserialising resource '{}' with xstream", request.getResourceId());

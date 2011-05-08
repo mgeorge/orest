@@ -69,7 +69,7 @@ public abstract class RestConfiguration {
     }
 
     public void addResourceType(Class clazz, String type) {
-        resourceTypes.put(type, clazz);
+        resourceTypes.put(type.toLowerCase(), clazz);
     }
 
     protected void addFormat(RestFormat format) {
@@ -85,7 +85,7 @@ public abstract class RestConfiguration {
     }
 
     public Class getResourceType(String type) {
-        return resourceTypes.get(type);
+        return resourceTypes.get(type.toLowerCase());
     }
 
     public Map<String, Class> getResourceTypes() {
