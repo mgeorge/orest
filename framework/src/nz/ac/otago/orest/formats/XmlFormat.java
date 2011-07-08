@@ -34,6 +34,8 @@ public class XmlFormat implements RestFormat {
 
       logger.debug("Serialising resource '{}' with xstream", request.getResourceId());
       String xml = mapper.toXML(resource);
+
+      logger.debug("Sending the following data:\n\n{}\n\n", xml);
       return xml;
    }
 
@@ -54,7 +56,8 @@ public class XmlFormat implements RestFormat {
    }
 
    public RestResource deserialiseResource(String data, RestRequest request) {
-      System.out.println("\n\n"+data+"\n\n");
+      logger.debug("Received the following data:\n\n{}\n\n", data);
+
 
       // need to get the root element so we can set the correct alias for xstream
       Pattern pattern = Pattern.compile(getRootPattern());
