@@ -1,1 +1,3 @@
-Placeholder for OREST project.
+# A simple REST framework
+
+More to come...
